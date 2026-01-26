@@ -1,6 +1,13 @@
 import { z } from "zod";
 
 export const zSchema = z.object({
+  name: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters" })
+    .max(50, { message: "Name must be at most 50 characters" })
+    .regex(/^[A-Za-z\s]+$/, {
+      message: "Name can only contain letters and spaces",
+    }),
   email: z
     .string()
     .min(1, { message: "Email is required" })

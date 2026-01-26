@@ -18,24 +18,35 @@ import {
 import { Input } from "@/components/ui/input";
 import ButtonLoading from "@/components/Application/ButtonLoading";
 import Link from "next/link";
-import { WEB_FORGOT_PASS, WEB_REGISTER } from "@/Routes/WebRoutes";
+import { WEB_LOGIN } from "@/Routes/WebRoutes";
 
-const Login = () => {
+const Register = () => {
   const [isTypePassword, setIsTypePassword] = useState(true);
-  const formSchema = zSchema.pick({
-    email: true,
-    password: true,
-  });
+  const formSchema = zSchema
+    .pick({
+      name: true,
+      email: true,
+      password: true,
+    })
+    .extend({
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: "Password and Confirm Password must be same",
+      path: ["confirmPassword"],
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const handleLogin = (data: z.infer<typeof formSchema>) => {
+  const handleRegister = (data: z.infer<typeof formSchema>) => {
     console.log("Login data:", data);
     // TODO: Call your login API here
   };
@@ -43,12 +54,33 @@ const Login = () => {
   return (
     <Card className="w-[450px] py-10">
       <CardContent>
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Login Into Account
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleRegister)}
+            className="space-y-4"
+          >
+            {/* Name */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="">
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      autoComplete="off"
+                      type="text"
+                      placeholder="Mr. Don"
+                      {...field}
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* Email */}
             <FormField
               control={form.control}
@@ -85,6 +117,26 @@ const Login = () => {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/*Confirm Password */}
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem className="relative">
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type={isTypePassword ? "password" : "text"}
+                      autoComplete="new-password"
+                      placeholder="********"
+                      {...field}
+                    />
+                  </FormControl>
                   <button
                     onClick={() => setIsTypePassword(!isTypePassword)}
                     className="absolute top-1/2 right-2 cursor-pointer"
@@ -96,23 +148,20 @@ const Login = () => {
                 </FormItem>
               )}
             />
-            <div className="mt-1 text-sm text-primary">
-              <Link href={WEB_FORGOT_PASS}> Forgot Password</Link>
-            </div>
 
             {/* Submit button */}
             <CardFooter className="p-0">
               <ButtonLoading
-                text="Login"
+                text="Register"
                 type="submit"
                 className={"w-full cursor-pointer"}
               />
             </CardFooter>
 
             <div className="mt-3 flex items-center gap-2 text-sm">
-              <p> Don`t have an account?</p>
-              <Link className="text-primary" href={WEB_REGISTER}>
-                Create Account
+              <p> Already have an account?</p>
+              <Link className="text-primary" href={WEB_LOGIN}>
+                Login
               </Link>
             </div>
           </form>
@@ -122,4 +171,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
