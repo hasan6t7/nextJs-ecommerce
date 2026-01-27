@@ -1,6 +1,6 @@
 import { zSchema } from "@/lib/zodSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -14,8 +14,10 @@ import { Input } from "../ui/input";
 import { CardFooter } from "../ui/card";
 import ButtonLoading from "./ButtonLoading";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
+import axios from "axios";
 
 const OtpVerification = ({ email, onSubmit, loading }) => {
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
   const formSchema = zSchema.pick({
     otp: true,
     email: true,
@@ -30,7 +32,23 @@ const OtpVerification = ({ email, onSubmit, loading }) => {
   });
 
   const handleOtpVerification = async (values) => {
-    onSubmit(values)
+    onSubmit(values);
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      setIsResendingOtp(true);
+      const { data: ResendOtpResponse } = await axios.post("/api/auth/resend-otp", {email});
+      if (!ResendOtpResponse.success) {
+        throw new Error(ResendOtpResponse.message);
+      }
+     
+      alert(ResendOtpResponse.message);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setIsResendingOtp(false);
+    }
   };
   return (
     <div>
@@ -84,9 +102,19 @@ const OtpVerification = ({ email, onSubmit, loading }) => {
             />
           </CardFooter>
           <div className="text-center mt-5">
-            <button type="button" className="cursor-pointer text-primary ">
-              Resend OTP
-            </button>
+            {!isResendingOtp ? (
+              <>
+                <button
+                  onClick={handleResendOtp}
+                  type="button"
+                  className="cursor-pointer text-primary "
+                >
+                  Resend OTP
+                </button>
+              </>
+            ) : (
+              <span>Resending...</span>
+            )}
           </div>
         </form>
       </Form>

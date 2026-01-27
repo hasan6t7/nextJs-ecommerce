@@ -16,16 +16,16 @@ export async function POST(request) {
     });
 
     const validatedData = validationSchema.safeParse(payload);
-    if (!validatedData) {
+    if (!validatedData.success) {
       return response(false, 401, "Invalid or Missing Input");
     }
-    const { otp, email } = validatedData;
+    const { otp, email } = validatedData.data;
     const getOtpData = await OTPModel.findOne({ email, otp });
     if (!getOtpData) {
       return response(false, 404, "Invalid or expired otp");
     }
 
-    const getUser = await UserModel.find({ deletedAt: null, email }).lean();
+    const getUser = await UserModel.findOne({ deletedAt: null, email }).lean();
 
     if (!getUser) {
       return response(false, 404, "User Not Found");
@@ -54,7 +54,7 @@ export async function POST(request) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     });
-    await getOtpData.deleteOne();
+    await OTPModel.findByIdAndDelete(getOtpData._id);
 
     return response(true, 200, "Login Successfully Done");
   } catch (error) {
