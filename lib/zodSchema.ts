@@ -21,4 +21,5 @@ export const zSchema = z.object({
       message:
         "Password must contain uppercase, lowercase, number, and special character",
     }),
+  otp: z.string().regex(/^\d{6}$/, "OTP must be exactly 6 digits"),
 });
