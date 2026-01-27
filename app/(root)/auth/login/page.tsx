@@ -19,9 +19,11 @@ import { Input } from "@/components/ui/input";
 import ButtonLoading from "@/components/Application/ButtonLoading";
 import Link from "next/link";
 import { WEB_FORGOT_PASS, WEB_REGISTER } from "@/Routes/WebRoutes";
+import axios from "axios";
 
 const Login = () => {
   const [isTypePassword, setIsTypePassword] = useState(true);
+  const [loading, setLoading] = useState(false);
   const formSchema = zSchema.pick({
     email: true,
     password: true,
@@ -35,9 +37,23 @@ const Login = () => {
     },
   });
 
-  const handleLogin = (data: z.infer<typeof formSchema>) => {
-    console.log("Login data:", data);
-    // TODO: Call your login API here
+  const handleLogin = async (values) => {
+    try {
+      setLoading(true);
+      const { data: LoginResponse } = await axios.post(
+        "/api/auth/login",
+        values,
+      );
+      if (!LoginResponse.success) {
+        throw new Error(LoginResponse.message);
+      }
+      form.reset();
+      alert(LoginResponse.message);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -105,6 +121,7 @@ const Login = () => {
               <ButtonLoading
                 text="Login"
                 type="submit"
+                loading={loading}
                 className={"w-full cursor-pointer"}
               />
             </CardFooter>
