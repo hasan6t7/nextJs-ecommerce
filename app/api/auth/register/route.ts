@@ -43,7 +43,7 @@ export async function POST(request) {
     await newRegister.save();
 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const token = await new SignJWT({ userId: newRegister._id })
+    const token = await new SignJWT({ userId: newRegister._id.toString() })
       .setIssuedAt()
       .setExpirationTime("1h")
       .setProtectedHeader({ alg: "HS256" })
@@ -53,7 +53,7 @@ export async function POST(request) {
       "Email Verification From Hasan",
       email,
       emailVerificationLink(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email/${token}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`,
       ),
     );
     return response(
