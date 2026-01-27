@@ -59,21 +59,20 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
-
-userSchema.methods.comparePassword = async function (enteredPassword) {
+userSchema.methods.comparePassword = async function (password) {
   if (!this.password) {
     throw new Error("Password field not available for comparison. Ensure you used .select('+password')");
   }
-  return await bcrypt.compare(enteredPassword, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
-const userModel =
+const UserModel =
   mongoose.models.User || mongoose.model("User", userSchema, "users");
 
-export default userModel;
+export default UserModel;

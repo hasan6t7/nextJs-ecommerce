@@ -19,8 +19,10 @@ import { Input } from "@/components/ui/input";
 import ButtonLoading from "@/components/Application/ButtonLoading";
 import Link from "next/link";
 import { WEB_LOGIN } from "@/Routes/WebRoutes";
+import axios from "axios";
 
 const Register = () => {
+  const [loading, setLoading] = useState(false);
   const [isTypePassword, setIsTypePassword] = useState(true);
   const formSchema = zSchema
     .pick({
@@ -36,7 +38,7 @@ const Register = () => {
       path: ["confirmPassword"],
     });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -46,9 +48,20 @@ const Register = () => {
     },
   });
 
-  const handleRegister = (data: z.infer<typeof formSchema>) => {
-    console.log("Login data:", data);
-    // TODO: Call your login API here
+  const handleRegister =async (values) => {
+    try {
+      setLoading(true);
+      const { data: RegisterResponse } =await axios.post("/api/auth/register", values);
+      if(!RegisterResponse.success){
+        throw new Error(RegisterResponse.message)
+      }
+      form.reset()
+      alert(RegisterResponse.message)
+    } catch (error) {
+      alert(error.message)
+    }finally{
+      setLoading(false)
+    }
   };
 
   return (
@@ -154,6 +167,7 @@ const Register = () => {
               <ButtonLoading
                 text="Register"
                 type="submit"
+                loading={loading}
                 className={"w-full cursor-pointer"}
               />
             </CardFooter>
