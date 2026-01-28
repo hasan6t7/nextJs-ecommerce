@@ -91,6 +91,6 @@ export async function POST(request) {
     }
     return response(true, 200, "Please Verify Your Device");
   } catch (error) {
-    catchError(error);
+    return catchError(error);
   }
 }

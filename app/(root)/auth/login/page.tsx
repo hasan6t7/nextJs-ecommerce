@@ -21,12 +21,15 @@ import Link from "next/link";
 import { WEB_FORGOT_PASS, WEB_REGISTER } from "@/Routes/WebRoutes";
 import axios from "axios";
 import OtpVerification from "@/components/Application/OtpVerification";
+import { useDispatch } from "react-redux";
+import { login } from "@/store/reducer/authReducer";
 
 const Login = () => {
   const [isTypePassword, setIsTypePassword] = useState(true);
   const [loading, setLoading] = useState(false);
   const [otpVerificationLoading, setOtpVerificationLoading] = useState(false);
   const [otpEmail, setOtpEmail] = useState();
+  const dispatch = useDispatch();
   const formSchema = zSchema.pick({
     email: true,
     password: true,
@@ -71,8 +74,9 @@ const Login = () => {
         throw new Error(OtpResponse.message);
       }
       setOtpEmail("");
-      
+
       alert(OtpResponse.message);
+      dispatch(login(OtpResponse.data));
     } catch (error) {
       alert(error.message);
     } finally {

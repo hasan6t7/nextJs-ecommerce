@@ -56,7 +56,7 @@ export async function POST(request) {
     });
     await OTPModel.findByIdAndDelete(getOtpData._id);
 
-    return response(true, 200, "Login Successfully Done");
+    return response(true, 200, "Login Successfully Done", loggedInUserData);
   } catch (error) {
     return catchError(error);
   }

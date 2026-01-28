@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export const response = (success, statuscode, message, data = {}) => {
   return NextResponse.json({
-    success,
+    success, 
     statuscode,
     message,
     data,
