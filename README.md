@@ -1,1 +1,1 @@
-Next js E-commerce with typescript 
+Next.Js E-commerce with typescript 
